@@ -19,8 +19,6 @@ package predicate
 import (
 	"reflect"
 	"strings"
-
-	"github.com/gravitational/trace"
 )
 
 // GetStringMapValue is a helper function that returns property
@@ -30,7 +28,7 @@ import (
 func GetStringMapValue(mapVal, keyVal interface{}) (interface{}, error) {
 	key, ok := keyVal.(string)
 	if !ok {
-		return nil, trace.BadParameter("only string keys are supported")
+		return nil, badParameter("only string keys are supported")
 	}
 	switch m := mapVal.(type) {
 	case map[string][]string:
@@ -46,7 +44,7 @@ func GetStringMapValue(mapVal, keyVal interface{}) (interface{}, error) {
 		}
 		return m[key], nil
 	default:
-		return nil, trace.BadParameter("type %T is not supported", m)
+		return nil, badParameter("type %T is not supported", m)
 	}
 }
 
@@ -130,14 +128,14 @@ func Not(a BoolPredicate) BoolPredicate {
 // GetFieldByTag returns a field from the object based on the tag
 func GetFieldByTag(ival interface{}, tagName string, fieldNames []string) (interface{}, error) {
 	if len(fieldNames) == 0 {
-		return nil, trace.BadParameter("missing field names")
+		return nil, badParameter("missing field names")
 	}
 	val := reflect.ValueOf(ival)
 	if val.Kind() == reflect.Interface || val.Kind() == reflect.Ptr {
 		val = val.Elem()
 	}
 	if val.Kind() != reflect.Struct {
-		return nil, trace.NotFound("field name %v is not found", strings.Join(fieldNames, "."))
+		return nil, notFound("field name %v is not found", strings.Join(fieldNames, "."))
 	}
 	fieldName := fieldNames[0]
 	rest := fieldNames[1:]
@@ -154,5 +152,5 @@ func GetFieldByTag(ival interface{}, tagName string, fieldNames []string) (inter
 			return GetFieldByTag(value, tagName, rest)
 		}
 	}
-	return nil, trace.NotFound("field name %v is not found", strings.Join(fieldNames, "."))
+	return nil, notFound("field name %v is not found", strings.Join(fieldNames, "."))
 }

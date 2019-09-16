@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gravitational/trace"
 	"gopkg.in/check.v1"
 )
 
@@ -43,7 +42,7 @@ func (s *PredicateSuite) getParserWithOpts(c *check.C, getID GetIdentifierFn, ge
 				return arg, nil
 			},
 			"fnerr": func(arg interface{}) (interface{}, error) {
-				return nil, trace.BadParameter("don't like this parameter")
+				return nil, badParameter("don't like this parameter")
 			},
 		},
 		GetIdentifier: getID,
@@ -392,9 +391,9 @@ func (s *PredicateSuite) TestGetTagField(c *check.C) {
 		// pointer to struct
 		{tag: "json", val: &val, fields: []string{"param", "key1"}, expect: val.Param.Key1},
 		// not found field
-		{tag: "json", val: &val, fields: []string{"param", "key3"}, err: trace.NotFound("not found")},
+		{tag: "json", val: &val, fields: []string{"param", "key3"}, err: notFound("not found")},
 		// nil pointer
-		{tag: "json", val: nil, fields: []string{"param", "key1"}, err: trace.BadParameter("bad param")},
+		{tag: "json", val: nil, fields: []string{"param", "key1"}, err: badParameter("bad param")},
 	}
 
 	for i, tc := range testCases {
